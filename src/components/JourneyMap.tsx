@@ -9,8 +9,8 @@ import landTopo from "world-atlas/land-110m.json";
 import type { Chapter } from "@/content/journey";
 
 const W = 1000;
-const H = 520;
-const PAD = 26;
+const H = 1200;
+const PAD = 38;
 
 // world-atlas ships a TopoJSON topology; feature() gives us the land polygons.
 const land = feature(
@@ -22,11 +22,11 @@ const land = feature(
 const REGION = {
   type: "Polygon" as const,
   coordinates: [[
-    [-17, 61],
-    [99, 61],
-    [99, 3],
-    [-17, 3],
-    [-17, 61],
+    [-30, 72],
+    [114, 72],
+    [114, -10],
+    [-30, -10],
+    [-30, 72],
   ]],
 };
 
@@ -44,13 +44,13 @@ type LabelDir = Chapter["label"];
 function labelPlacement(dir: LabelDir) {
   switch (dir) {
     case "e":
-      return { dx: 13, nameY: 4, yearY: 19, anchor: "start" as const };
+      return { dx: 16, nameY: 6, yearY: 24, anchor: "start" as const };
     case "w":
-      return { dx: -13, nameY: 4, yearY: 19, anchor: "end" as const };
+      return { dx: -16, nameY: 6, yearY: 24, anchor: "end" as const };
     case "n":
-      return { dx: 0, nameY: -24, yearY: -10, anchor: "middle" as const };
+      return { dx: 0, nameY: -26, yearY: -8, anchor: "middle" as const };
     case "s":
-      return { dx: 0, nameY: 24, yearY: 39, anchor: "middle" as const };
+      return { dx: 0, nameY: 28, yearY: 46, anchor: "middle" as const };
   }
 }
 
@@ -108,13 +108,14 @@ export default function JourneyMap({
   return (
     <svg
       viewBox={`0 0 ${W} ${H}`}
+      preserveAspectRatio="xMidYMid slice"
       className="h-full w-full"
       role="img"
       aria-label={`Map showing the route from ${chapters[0]?.place} to ${chapters.at(-1)?.place}`}
     >
       <rect width={W} height={H} fill="#141017" />
-      <path d={gratD} fill="none" stroke="#2f2925" strokeWidth="0.6" opacity="0.55" />
-      <path d={landD} fill="#2b2621" stroke="#4a4137" strokeWidth="0.7" />
+      <path d={gratD} fill="none" stroke="#2f2925" strokeWidth="0.9" opacity="0.5" />
+      <path d={landD} fill="#2b2621" stroke="#4a4137" strokeWidth="0.9" />
 
       {/* faint full-route guide (also drives the travelling head) */}
       <path
@@ -122,9 +123,9 @@ export default function JourneyMap({
         d={routeD}
         fill="none"
         stroke="var(--color-muted)"
-        strokeWidth="1.6"
+        strokeWidth="2.2"
         strokeLinecap="round"
-        strokeDasharray="2 7"
+        strokeDasharray="2 8"
         opacity="0.55"
       />
 
@@ -133,15 +134,15 @@ export default function JourneyMap({
         d={routeD}
         fill="none"
         stroke="var(--color-saffron)"
-        strokeWidth="2.6"
+        strokeWidth="3.4"
         strokeLinecap="round"
         style={{ pathLength: progress }}
       />
 
       {/* travelling head */}
       <g ref={headRef}>
-        <circle r="7" fill="var(--color-saffron)" opacity="0.25" />
-        <circle r="3.4" fill="var(--color-saffron)" />
+        <circle r="9" fill="var(--color-saffron)" opacity="0.25" />
+        <circle r="4.2" fill="var(--color-saffron)" />
       </g>
 
       {/* stops */}
@@ -151,26 +152,26 @@ export default function JourneyMap({
         return (
           <g key={p.id} transform={`translate(${p.x} ${p.y})`}>
             {active && (
-              <circle r="14" fill="none" stroke="var(--color-saffron)" strokeWidth="1.2">
-                <animate attributeName="r" values="8;18;8" dur="2.4s" repeatCount="indefinite" />
+              <circle r="18" fill="none" stroke="var(--color-saffron)" strokeWidth="1.6">
+                <animate attributeName="r" values="11;26;11" dur="2.4s" repeatCount="indefinite" />
                 <animate attributeName="opacity" values="0.7;0;0.7" dur="2.4s" repeatCount="indefinite" />
               </circle>
             )}
             <circle
-              r={active ? 6 : 4}
+              r={active ? 8 : 5.5}
               fill={visited ? "var(--color-saffron)" : "#141017"}
               stroke="var(--color-saffron)"
-              strokeWidth="1.7"
+              strokeWidth="2.2"
             />
             <text
               x={p.dx}
               y={p.nameY}
               textAnchor={p.anchor}
-              fontSize="16"
+              fontSize="24"
               fontFamily="var(--font-serif)"
               fill={active ? "var(--color-paper)" : "var(--color-muted)"}
               stroke="#141017"
-              strokeWidth="3.5"
+              strokeWidth="4.5"
               paintOrder="stroke"
             >
               {p.place}
@@ -179,11 +180,11 @@ export default function JourneyMap({
               x={p.dx}
               y={p.yearY}
               textAnchor={p.anchor}
-              fontSize="10.5"
+              fontSize="14"
               fontFamily="var(--font-mono)"
               fill="var(--color-muted)"
               stroke="#141017"
-              strokeWidth="3"
+              strokeWidth="3.5"
               paintOrder="stroke"
             >
               {p.years}

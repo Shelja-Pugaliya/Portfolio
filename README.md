@@ -18,10 +18,9 @@ npm run build      # production build
 
 | What | File |
 | --- | --- |
-| Name, tagline, links, CV path | `src/content/profile.ts` |
-| Journey chapters (text, transcript, map pin, audio) | `src/content/journey.ts` |
+| Name, tagline, links, CV path, email | `src/content/profile.ts` |
+| Journey chapters (text, transcript, map pin, photo, audio) | `src/content/journey.ts` |
 | Projects, experience, skills | `src/content/projects.ts` |
-| Caricature illustrations | `src/components/CaricatureScene.tsx` |
 | Colours, fonts, texture | `src/app/globals.css` (`@theme` block) |
 
 Add a stop or a project = one new entry in the relevant file.
@@ -29,6 +28,9 @@ Add a stop or a project = one new entry in the relevant file.
 ## Assets to drop in
 
 - `public/cv.pdf` — the downloadable CV (currently a copy of the latest CV; replace when updated).
+- `public/images/guwahati.jpg`, `public/images/bangalore.jpg`, `public/images/dublin.jpg` —
+  one photo per chapter. Paths are the `image` field in `src/content/journey.ts`; change the
+  extension there if you use `.png`/`.webp`. Landscape ~4:3 crops best.
 - `public/audio/chapter-1-guwahati.mp3`
 - `public/audio/chapter-2-bangalore.mp3`
 - `public/audio/chapter-3-ireland.mp3`

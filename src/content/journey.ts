@@ -7,7 +7,8 @@ export type Chapter = {
   coords: [number, number];
   /** Which side of the map pin its label sits on. */
   label: "e" | "w" | "n" | "s";
-  scene: "guwahati" | "bangalore" | "ireland";
+  /** Chapter photo — a file under `public/` (see public/images/). */
+  image: string;
   /** Short on-page narrative, shown as paragraphs. */
   body: string[];
   /** Tag chips shown under the chapter. */
@@ -26,7 +27,7 @@ export const journey: Chapter[] = [
     years: "2003 – 2017",
     coords: [91.75, 26.18],
     label: "e",
-    scene: "guwahati",
+    image: "/images/guwahati.jpg",
     body: [
       "My story starts in Guwahati, in 2003, with our first family computer. I was the kid who needed to know what was happening behind the screen — why it did what it did.",
       "My father put it to work first: he had me typing up his tax audit reports in Word, and somewhere between the formatting and the formulas, I was hooked. When it came time to choose a stream in higher secondary, there was no debate — Computer Science.",
@@ -44,7 +45,7 @@ export const journey: Chapter[] = [
     years: "2017 – 2024",
     coords: [77.59, 12.97],
     label: "s",
-    scene: "bangalore",
+    image: "/images/bangalore.jpg",
     body: [
       "Then Bangalore, for a BCA in IoT at Jain University. I finished in the first division — but the real learning happened around the edges: I built my first drone, prototyped a machine that used IoT to sort building waste, and ran the books for our cultural team as head of finance.",
       "After that came four years at Kaplan North America, building enterprise learning platforms in .NET and Angular. I was nominated for the Kaplan Way awards, won a few, and was named Star Performer of the Month more than once.",
@@ -69,7 +70,7 @@ export const journey: Chapter[] = [
     years: "2024 – now",
     coords: [-6.59, 53.38],
     label: "w",
-    scene: "ireland",
+    image: "/images/dublin.jpg",
     body: [
       "And now, Ireland — an MSc in Computer Science at Maynooth University. Alongside my own studies I work as a demonstrator, sitting with students to help them through the parts of CS that don't click the first time. Teaching sharpened my own fundamentals more than anything else.",
       "At Unum, my Salesforce DevOps internship, I've been building AI-assisted tooling and CI/CD quality gates — cutting roughly 70% of the manual effort in plugin development. I also helped build a Microsoft-mentored subtitle translator on Next.js and Azure OpenAI, and a real-time risk monitor for renewable energy grids.",

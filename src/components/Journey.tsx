@@ -75,7 +75,7 @@ export default function Journey() {
       <div ref={ref} className="mt-10 md:grid md:grid-cols-[0.95fr_1.05fr] md:gap-14">
         {/* sticky map (desktop) */}
         <div className="hidden md:block">
-          <div className="sticky top-20 aspect-[10/7] w-full overflow-hidden rounded-2xl border border-line bg-ink-3">
+          <div className="sticky top-20 aspect-[100/52] w-full overflow-hidden rounded-2xl border border-line bg-ink-3">
             <JourneyMap chapters={journey} progress={scrollYProgress} activeIndex={active} />
           </div>
         </div>

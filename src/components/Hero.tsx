@@ -43,7 +43,7 @@ export default function Hero() {
         <a href={profile.links.linkedin} className="hover:text-paper" target="_blank" rel="noreferrer">
           LinkedIn
         </a>
-        <a href={`mailto:${profile.email}`} className="hover:text-paper">
+        <a href={profile.emailHref} className="hover:text-paper">
           Email
         </a>
       </div>

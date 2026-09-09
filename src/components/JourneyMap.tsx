@@ -1,21 +1,57 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { motion, useMotionValueEvent, type MotionValue } from "motion/react";
+import { geoNaturalEarth1, geoPath, geoGraticule10, geoInterpolate } from "d3-geo";
+import { feature } from "topojson-client";
+import type { FeatureCollection } from "geojson";
+import landTopo from "world-atlas/land-110m.json";
 import type { Chapter } from "@/content/journey";
 
-function routeD(pts: { x: number; y: number }[]) {
-  if (pts.length < 2) return "";
-  let d = `M ${pts[0].x} ${pts[0].y}`;
-  for (let i = 1; i < pts.length; i++) {
-    const prev = pts[i - 1];
-    const cur = pts[i];
-    const mx = (prev.x + cur.x) / 2;
-    // lift the control point to bow the arc upward
-    const my = (prev.y + cur.y) / 2 - Math.abs(cur.x - prev.x) * 0.18 - 20;
-    d += ` Q ${mx} ${my} ${cur.x} ${cur.y}`;
+const W = 1000;
+const H = 520;
+const PAD = 26;
+
+// world-atlas ships a TopoJSON topology; feature() gives us the land polygons.
+const land = feature(
+  landTopo as unknown as Parameters<typeof feature>[0],
+  (landTopo as unknown as { objects: { land: object } }).objects.land as never,
+) as unknown as FeatureCollection;
+
+// Crop to the Ireland <-> India corridor so the journey fills the frame.
+const REGION = {
+  type: "Polygon" as const,
+  coordinates: [[
+    [-17, 61],
+    [99, 61],
+    [99, 3],
+    [-17, 3],
+    [-17, 61],
+  ]],
+};
+
+const projection = geoNaturalEarth1().fitExtent(
+  [
+    [PAD, PAD],
+    [W - PAD, H - PAD],
+  ],
+  REGION,
+);
+const pathGen = geoPath(projection);
+const project = (c: [number, number]) => projection(c) ?? [0, 0];
+
+type LabelDir = Chapter["label"];
+function labelPlacement(dir: LabelDir) {
+  switch (dir) {
+    case "e":
+      return { dx: 13, nameY: 4, yearY: 19, anchor: "start" as const };
+    case "w":
+      return { dx: -13, nameY: 4, yearY: 19, anchor: "end" as const };
+    case "n":
+      return { dx: 0, nameY: -24, yearY: -10, anchor: "middle" as const };
+    case "s":
+      return { dx: 0, nameY: 24, yearY: 39, anchor: "middle" as const };
   }
-  return d;
 }
 
 export default function JourneyMap({
@@ -27,8 +63,28 @@ export default function JourneyMap({
   progress: MotionValue<number>;
   activeIndex: number;
 }) {
-  const pts = chapters.map((c) => c.map);
-  const d = routeD(pts);
+  const { landD, gratD, routeD, pins } = useMemo(() => {
+    const routePts: [number, number][] = [];
+    for (let s = 0; s < chapters.length - 1; s++) {
+      const interp = geoInterpolate(chapters[s].coords, chapters[s + 1].coords);
+      const steps = 56;
+      for (let i = s === 0 ? 0 : 1; i <= steps; i++) {
+        routePts.push(project(interp(i / steps)) as [number, number]);
+      }
+    }
+    return {
+      landD: pathGen(land) ?? "",
+      gratD: pathGen(geoGraticule10()) ?? "",
+      routeD: routePts
+        .map((p, i) => `${i ? "L" : "M"} ${p[0].toFixed(1)} ${p[1].toFixed(1)}`)
+        .join(" "),
+      pins: chapters.map((c) => {
+        const [x, y] = project(c.coords);
+        return { ...c, x, y, place: c.place, ...labelPlacement(c.label) };
+      }),
+    };
+  }, [chapters]);
+
   const guideRef = useRef<SVGPathElement>(null);
   const headRef = useRef<SVGGElement>(null);
 
@@ -42,7 +98,6 @@ export default function JourneyMap({
   });
 
   useEffect(() => {
-    // set initial head position
     const path = guideRef.current;
     const head = headRef.current;
     if (!path || !head) return;
@@ -52,96 +107,86 @@ export default function JourneyMap({
 
   return (
     <svg
-      viewBox="0 0 1000 560"
+      viewBox={`0 0 ${W} ${H}`}
       className="h-full w-full"
       role="img"
-      aria-label={`Map of the journey from ${chapters[0]?.place} to ${chapters.at(-1)?.place}`}
+      aria-label={`Map showing the route from ${chapters[0]?.place} to ${chapters.at(-1)?.place}`}
     >
-      <defs>
-        <pattern id="dots" width="30" height="30" patternUnits="userSpaceOnUse">
-          <circle cx="1.5" cy="1.5" r="1.5" fill="#3a332c" />
-        </pattern>
-      </defs>
+      <rect width={W} height={H} fill="#141017" />
+      <path d={gratD} fill="none" stroke="#2f2925" strokeWidth="0.6" opacity="0.55" />
+      <path d={landD} fill="#2b2621" stroke="#4a4137" strokeWidth="0.7" />
 
-      <rect width="1000" height="560" fill="#17130f" />
-      <rect width="1000" height="560" fill="url(#dots)" opacity="0.6" />
-
-      {/* abstract landmasses */}
-      <g fill="#2b2521" stroke="#4a3f35" strokeWidth="1.5">
-        {/* Europe / Ireland */}
-        <path d="M120 70 Q 220 40 320 80 Q 360 140 300 210 Q 220 250 160 210 Q 110 150 120 70 Z" />
-        {/* Middle land bridge */}
-        <path d="M330 150 Q 460 120 560 200 Q 600 260 520 300 Q 420 300 360 240 Q 320 200 330 150 Z" opacity="0.75" />
-        {/* Indian subcontinent */}
-        <path d="M600 210 Q 720 170 830 220 Q 860 300 780 420 Q 720 470 680 400 Q 610 320 600 210 Z" />
-      </g>
-
-      {/* faint full-route guide (also used for head-position math) */}
+      {/* faint full-route guide (also drives the travelling head) */}
       <path
         ref={guideRef}
-        d={d}
+        d={routeD}
         fill="none"
         stroke="var(--color-muted)"
-        strokeWidth="2.5"
+        strokeWidth="1.6"
         strokeLinecap="round"
-        strokeDasharray="2 8"
-        opacity="0.5"
+        strokeDasharray="2 7"
+        opacity="0.55"
       />
 
-      {/* drawn route, tied to scroll progress */}
+      {/* route drawn with scroll progress */}
       <motion.path
-        d={d}
+        d={routeD}
         fill="none"
         stroke="var(--color-saffron)"
-        strokeWidth="3.5"
+        strokeWidth="2.6"
         strokeLinecap="round"
-        strokeDasharray="1 3"
         style={{ pathLength: progress }}
       />
 
       {/* travelling head */}
       <g ref={headRef}>
-        <circle r="9" fill="var(--color-saffron)" opacity="0.25" />
-        <circle r="4" fill="var(--color-saffron)" />
+        <circle r="7" fill="var(--color-saffron)" opacity="0.25" />
+        <circle r="3.4" fill="var(--color-saffron)" />
       </g>
 
       {/* stops */}
-      {chapters.map((c, i) => {
+      {pins.map((p, i) => {
         const active = i === activeIndex;
         const visited = i <= activeIndex;
         return (
-          <g key={c.id} transform={`translate(${c.map.x} ${c.map.y})`}>
+          <g key={p.id} transform={`translate(${p.x} ${p.y})`}>
             {active && (
-              <circle r="18" fill="none" stroke="var(--color-saffron)" strokeWidth="1.5">
-                <animate attributeName="r" values="10;22;10" dur="2.4s" repeatCount="indefinite" />
+              <circle r="14" fill="none" stroke="var(--color-saffron)" strokeWidth="1.2">
+                <animate attributeName="r" values="8;18;8" dur="2.4s" repeatCount="indefinite" />
                 <animate attributeName="opacity" values="0.7;0;0.7" dur="2.4s" repeatCount="indefinite" />
               </circle>
             )}
             <circle
-              r={active ? 8 : 5.5}
-              fill={visited ? "var(--color-saffron)" : "var(--color-ink)"}
+              r={active ? 6 : 4}
+              fill={visited ? "var(--color-saffron)" : "#141017"}
               stroke="var(--color-saffron)"
-              strokeWidth="2"
+              strokeWidth="1.7"
             />
             <text
-              x={c.map.x > 500 ? 16 : -16}
-              y="5"
-              textAnchor={c.map.x > 500 ? "start" : "end"}
-              fontSize="17"
+              x={p.dx}
+              y={p.nameY}
+              textAnchor={p.anchor}
+              fontSize="16"
               fontFamily="var(--font-serif)"
               fill={active ? "var(--color-paper)" : "var(--color-muted)"}
+              stroke="#141017"
+              strokeWidth="3.5"
+              paintOrder="stroke"
             >
-              {c.place}
+              {p.place}
             </text>
             <text
-              x={c.map.x > 500 ? 16 : -16}
-              y="24"
-              textAnchor={c.map.x > 500 ? "start" : "end"}
-              fontSize="11"
+              x={p.dx}
+              y={p.yearY}
+              textAnchor={p.anchor}
+              fontSize="10.5"
               fontFamily="var(--font-mono)"
               fill="var(--color-muted)"
+              stroke="#141017"
+              strokeWidth="3"
+              paintOrder="stroke"
             >
-              {c.years}
+              {p.years}
             </text>
           </g>
         );

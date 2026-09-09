@@ -3,8 +3,10 @@ export type Chapter = {
   place: string;
   region: string;
   years: string;
-  /** Position on the map SVG (viewBox 0 0 1000 560). */
-  map: { x: number; y: number };
+  /** Real-world location as [longitude, latitude] — plotted on the world map. */
+  coords: [number, number];
+  /** Which side of the map pin its label sits on. */
+  label: "e" | "w" | "n" | "s";
   scene: "guwahati" | "bangalore" | "ireland";
   /** Short on-page narrative, shown as paragraphs. */
   body: string[];
@@ -22,7 +24,8 @@ export const journey: Chapter[] = [
     place: "Guwahati",
     region: "Assam, India",
     years: "2003 – 2017",
-    map: { x: 762, y: 250 },
+    coords: [91.75, 26.18],
+    label: "e",
     scene: "guwahati",
     body: [
       "My story starts in Guwahati, in 2003, with our first family computer. I was the kid who needed to know what was happening behind the screen — why it did what it did.",
@@ -39,7 +42,8 @@ export const journey: Chapter[] = [
     place: "Bangalore",
     region: "Karnataka, India",
     years: "2017 – 2024",
-    map: { x: 700, y: 360 },
+    coords: [77.59, 12.97],
+    label: "s",
     scene: "bangalore",
     body: [
       "Then Bangalore, for a BCA in IoT at Jain University. I finished in the first division — but the real learning happened around the edges: I built my first drone, prototyped a machine that used IoT to sort building waste, and ran the books for our cultural team as head of finance.",
@@ -63,7 +67,8 @@ export const journey: Chapter[] = [
     place: "Maynooth",
     region: "Ireland",
     years: "2024 – now",
-    map: { x: 232, y: 150 },
+    coords: [-6.59, 53.38],
+    label: "w",
     scene: "ireland",
     body: [
       "And now, Ireland — an MSc in Computer Science at Maynooth University. Alongside my own studies I work as a demonstrator, sitting with students to help them through the parts of CS that don't click the first time. Teaching sharpened my own fundamentals more than anything else.",

@@ -1,4 +1,5 @@
 import { profile } from "@/content/profile";
+import EmailActions from "./EmailActions";
 
 export default function Contact() {
   return (
@@ -9,13 +10,8 @@ export default function Contact() {
           Open to Software Engineer, DevOps and Platform roles in Ireland.
         </h2>
 
-        <div className="mt-8 flex flex-wrap gap-3">
-          <a
-            href={`mailto:${profile.email}`}
-            className="rounded-full bg-saffron px-5 py-2.5 text-sm font-medium text-ink transition hover:bg-saffron-soft"
-          >
-            {profile.email}
-          </a>
+        <div className="mt-8 flex flex-wrap items-center gap-3">
+          <EmailActions />
           <a
             href={profile.links.linkedin}
             target="_blank"

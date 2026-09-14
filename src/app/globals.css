@@ -11,9 +11,11 @@
   --color-saffron-soft: #f3c37e;
   --color-terracotta: #c96f43;
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
-  --font-serif: var(--font-serif), Georgia, "Times New Roman", serif;
+  /* Montserrat everywhere — the sans/serif/mono slots all resolve to it so
+     existing font-sans / font-serif / font-mono utilities stay valid. */
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
 }
 
 :root {
@@ -26,10 +28,75 @@ html {
 }
 
 body {
-  background: var(--color-ink);
+  /* Left transparent on purpose: the ink background lives on <html> so the
+     .dot-field layer (z-index: -1) can show through behind the content. */
+  background: transparent;
   color: var(--color-paper);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Dotted backdrop with a spotlight that follows the pointer.
+   Both layers share the same geometry so their dots stay in register:
+   ::before is the resting grid, ::after is the warmer grid revealed only
+   inside a radial mask centred on the cursor (--mx / --my, set by DotField). */
+.dot-field {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  --dot-gap: 22px;
+  --dot-radius: 1px;
+  --dot-halo: 220px;
+}
+
+.dot-field::before,
+.dot-field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-position: 0 0;
+  background-size: var(--dot-gap) var(--dot-gap);
+}
+
+.dot-field::before {
+  background-image: radial-gradient(
+    circle at center,
+    rgba(244, 237, 227, 0.09) var(--dot-radius),
+    transparent calc(var(--dot-radius) + 0.7px)
+  );
+}
+
+.dot-field::after {
+  background-image: radial-gradient(
+    circle at center,
+    rgba(232, 163, 61, 0.6) var(--dot-radius),
+    transparent calc(var(--dot-radius) + 0.7px)
+  );
+  background-color: rgba(232, 163, 61, 0.03);
+  opacity: var(--dot-glow, 0);
+  transition: opacity 400ms ease;
+  -webkit-mask-image: radial-gradient(
+    var(--dot-halo) var(--dot-halo) at var(--mx, 50%) var(--my, 50%),
+    #000 0%,
+    rgba(0, 0, 0, 0.45) 55%,
+    transparent 78%
+  );
+  mask-image: radial-gradient(
+    var(--dot-halo) var(--dot-halo) at var(--mx, 50%) var(--my, 50%),
+    #000 0%,
+    rgba(0, 0, 0, 0.45) 55%,
+    transparent 78%
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/* No pointer to follow, or motion turned down: keep the quiet grid only. */
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  .dot-field::after {
+    display: none;
+  }
 }
 
 /* Subtle film grain over the whole page */

@@ -11,6 +11,22 @@ export default function Chapter({
   index: number;
   total: number;
 }) {
+  const renderParagraph = (paragraph: string) => {
+    const match = paragraph.match(/^(.+?)\s+-\s+(.+)$/);
+
+    if (!match) {
+      return paragraph;
+    }
+
+    const [, title, rest] = match;
+
+    return (
+      <>
+        <strong>{title}</strong> - {rest}
+      </>
+    );
+  };
+
   return (
     <section
       id={chapter.id}
@@ -43,7 +59,7 @@ export default function Chapter({
 
         <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-paper/85 md:text-base">
           {chapter.body.map((p, i) => (
-            <p key={i}>{p}</p>
+            <p key={i}>{renderParagraph(p)}</p>
           ))}
         </div>
 

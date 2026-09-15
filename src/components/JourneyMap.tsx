@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { motion, useMotionValueEvent, type MotionValue } from "motion/react";
+import { motion, useMotionValueEvent, useSpring } from "motion/react";
 import { geoNaturalEarth1, geoPath, geoGraticule10, geoInterpolate } from "d3-geo";
 import { feature } from "topojson-client";
 import type { FeatureCollection } from "geojson";
@@ -56,22 +56,34 @@ function labelPlacement(dir: LabelDir) {
 
 export default function JourneyMap({
   chapters,
-  progress,
   activeIndex,
 }: {
   chapters: Chapter[];
-  progress: MotionValue<number>;
   activeIndex: number;
 }) {
-  const { landD, gratD, routeD, pins } = useMemo(() => {
+  const { landD, gratD, routeD, pins, pinFractions } = useMemo(() => {
     const routePts: [number, number][] = [];
+    // routePts index where each chapter's pin sits along the path.
+    const pinIdx: number[] = [0];
     for (let s = 0; s < chapters.length - 1; s++) {
       const interp = geoInterpolate(chapters[s].coords, chapters[s + 1].coords);
       const steps = 56;
       for (let i = s === 0 ? 0 : 1; i <= steps; i++) {
         routePts.push(project(interp(i / steps)) as [number, number]);
       }
+      pinIdx.push(routePts.length - 1);
     }
+
+    // Cumulative arc length so each pin maps to a 0..1 fraction of the route
+    // that matches pathLength / getPointAtLength (both arc-length based).
+    const cum = [0];
+    for (let i = 1; i < routePts.length; i++) {
+      const [ax, ay] = routePts[i - 1];
+      const [bx, by] = routePts[i];
+      cum.push(cum[i - 1] + Math.hypot(bx - ax, by - ay));
+    }
+    const total = cum[cum.length - 1] || 1;
+
     return {
       landD: pathGen(land) ?? "",
       gratD: pathGen(geoGraticule10()) ?? "",
@@ -82,13 +94,23 @@ export default function JourneyMap({
         const [x, y] = project(c.coords);
         return { ...c, x, y, place: c.place, ...labelPlacement(c.label) };
       }),
+      pinFractions: pinIdx.map((idx) => cum[idx] / total),
     };
   }, [chapters]);
 
   const guideRef = useRef<SVGPathElement>(null);
   const headRef = useRef<SVGGElement>(null);
 
-  useMotionValueEvent(progress, "change", (v) => {
+  // Travel to the active chapter's pin and rest there — driven by which
+  // chapter is in view, not by raw scroll, so the head parks on each city.
+  const target = pinFractions[activeIndex] ?? 0;
+  const drawn = useSpring(0, { stiffness: 80, damping: 20, mass: 0.7 });
+
+  useEffect(() => {
+    drawn.set(target);
+  }, [target, drawn]);
+
+  useMotionValueEvent(drawn, "change", (v) => {
     const path = guideRef.current;
     const head = headRef.current;
     if (!path || !head) return;
@@ -101,9 +123,9 @@ export default function JourneyMap({
     const path = guideRef.current;
     const head = headRef.current;
     if (!path || !head) return;
-    const p = path.getPointAtLength(0);
+    const p = path.getPointAtLength(drawn.get() * path.getTotalLength());
     head.setAttribute("transform", `translate(${p.x} ${p.y})`);
-  }, []);
+  }, [drawn]);
 
   return (
     <svg
@@ -136,7 +158,7 @@ export default function JourneyMap({
         stroke="var(--color-saffron)"
         strokeWidth="3.4"
         strokeLinecap="round"
-        style={{ pathLength: progress }}
+        style={{ pathLength: drawn }}
       />
 
       {/* travelling head */}

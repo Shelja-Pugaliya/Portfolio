@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useScroll } from "motion/react";
 import { journey } from "@/content/journey";
 import JourneyMap from "./JourneyMap";
 import Chapter from "./Chapter";
@@ -9,11 +8,6 @@ import Chapter from "./Chapter";
 export default function Journey() {
   const ref = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
-
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start 60%", "end 75%"],
-  });
 
   // Track the chapter nearest the viewport middle with a plain observer.
   useEffect(() => {
@@ -76,7 +70,7 @@ export default function Journey() {
         {/* sticky map (desktop) */}
         <div className="hidden md:block">
           <div className="sticky top-24 aspect-[5/6] max-h-[calc(100vh-8rem)] w-full overflow-hidden rounded-2xl border border-line bg-[#141017]">
-            <JourneyMap chapters={journey} progress={scrollYProgress} activeIndex={active} />
+            <JourneyMap chapters={journey} activeIndex={active} />
           </div>
         </div>
 

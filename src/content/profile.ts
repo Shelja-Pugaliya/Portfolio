@@ -2,7 +2,7 @@ export const profile = {
   name: "Shelja Pugaliya",
   role: "Software & DevOps Engineer",
   tagline:
-    "MSc Computer Science, 4+ years full-stack (.NET, Angular, TypeScript). Building reliable, scalable systems — and the pipelines that ship them.",
+    "I make complex systems feel simple.\nFour years of building enterprise platforms at Kaplan, now designing developer tooling and CI/CD pipelines in Ireland.\n.Net| Angular| TypeScript| Python | CI/CD | Salesforce",
   location: "Dublin, Ireland",
   email: "pugaliyas8@gmail.com",
   links: {

@@ -65,7 +65,7 @@ export const journey: Chapter[] = [
   },
   {
     id: "ireland",
-    place: "Maynooth",
+    place: "Dublin",
     region: "Ireland",
     years: "2024 – now",
     coords: [-6.59, 53.38],

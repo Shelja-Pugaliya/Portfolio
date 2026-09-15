@@ -14,7 +14,9 @@ export default function Hero() {
       <h1 className="mt-4 font-serif text-5xl leading-[1.05] text-paper sm:text-6xl md:text-7xl">
         {profile.name}
       </h1>
-      <p className="mt-5 max-w-2xl text-lg text-paper/80 md:text-xl">{profile.tagline}</p>
+      <p className="mt-5 max-w-2xl whitespace-pre-line text-base italic text-paper/80 md:text-lg">
+        {profile.tagline}
+      </p>
 
       <p className="mt-8 font-mono text-sm text-muted">{places}</p>
 

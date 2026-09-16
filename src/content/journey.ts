@@ -30,6 +30,7 @@ export const journey: Chapter[] = [
     coords: [91.75, 26.18],
     label: "e",
     image: "/images/guwahati.jpg",
+    images: ["/images/guwahati.jpg", "/images/Guwahati_comp.png"],
     body: [
       "It started in 2003 with our first family computer. I was the kid who needed to know what was happening behind the screen. My father put it to work first, having me type up his tax audit reports in Word. Somewhere between the formatting and the formulas, I was hooked.",
       "When it came time to choose a stream in higher secondary, there was no debate. Computer Science. That's where I met C and C++, and first understood what a compiler actually does: turn what I write into something a machine can run. That idea, that every system is just layers translating intent into action, is the one I've kept chasing.",
@@ -48,6 +49,11 @@ export const journey: Chapter[] = [
     coords: [77.59, 12.97],
     label: "s",
     image: "/images/bangalore.jpg",
+    images: [
+      "/images/bangalore.jpg",
+      "/images/Kaplan_Bangalore.png",
+      "/images/Badminton_Bangalore.png",
+    ],
     body: [
       "A BCA in IoT at Jain University, finished in the first division. But the real learning happened around the edges. I built my first drone, prototyped a machine that used IoT sensors to sort building waste, and ran finances for our cultural team as head of the committee.",
       "Then came four years at Kaplan North America, building enterprise learning platforms in .NET and Angular. I was named Star Performer of the Month more than once and nominated for the Kaplan Way awards. Those years taught me how software actually ships. Not the textbook version. The real one: code reviews at 11pm, releases that don't go as planned, the messy human coordination that no framework abstracts away.",

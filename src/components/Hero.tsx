@@ -12,7 +12,7 @@ export default function Hero() {
   return (
     <section
       id="top"
-      className="relative mx-auto flex min-h-[88vh] max-w-6xl flex-col justify-center overflow-hidden px-5 py-24"
+      className="relative mx-auto flex max-w-6xl flex-col justify-center overflow-hidden px-5 pt-28 pb-12 md:pt-32"
     >
       {/* ambient illustration filling the empty right side */}
       <div

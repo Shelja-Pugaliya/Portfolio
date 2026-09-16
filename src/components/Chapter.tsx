@@ -1,6 +1,6 @@
-import Image from "next/image";
 import type { Chapter as ChapterT } from "@/content/journey";
 import AudioPlayer from "./AudioPlayer";
+import ChapterSlideshow from "./ChapterSlideshow";
 
 export default function Chapter({
   chapter,
@@ -47,15 +47,10 @@ export default function Chapter({
           <span className="ml-3 align-middle text-base text-muted">{chapter.region}</span>
         </h3>
 
-        <div className="relative mt-6 aspect-[4/3] overflow-hidden rounded-xl border border-line bg-ink-2">
-          <Image
-            src={chapter.image}
-            alt={`${chapter.place}, ${chapter.region}`}
-            fill
-            sizes="(min-width: 768px) 40vw, 90vw"
-            className="object-cover"
-          />
-        </div>
+        <ChapterSlideshow
+          images={chapter.images ?? [chapter.image]}
+          alt={`${chapter.place}, ${chapter.region}`}
+        />
 
         <div className="mt-6 space-y-4 text-[15px] leading-relaxed text-paper/85 md:text-base">
           {chapter.body.map((p, i) => (

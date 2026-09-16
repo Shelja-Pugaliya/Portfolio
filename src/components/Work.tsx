@@ -11,7 +11,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 export default function Work() {
   return (
-    <section id="work" className="mx-auto max-w-6xl px-5 py-20 md:py-28">
+    <section id="work" className="mx-auto max-w-6xl px-5 pb-20 pt-6 md:pb-28 md:pt-8">
       <SectionLabel>Selected Work</SectionLabel>
 
       <div className="mt-8 grid gap-4 md:grid-cols-2">

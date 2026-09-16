@@ -9,6 +9,8 @@ export type Chapter = {
   label: "e" | "w" | "n" | "s";
   /** Chapter photo — a file under `public/` (see public/images/). */
   image: string;
+  /** Optional extra photos — when present, the chapter photo becomes a slideshow. */
+  images?: string[];
   /** Short on-page narrative, shown as paragraphs. */
   body: string[];
   /** Tag chips shown under the chapter. */
@@ -71,6 +73,7 @@ export const journey: Chapter[] = [
     coords: [-6.59, 53.38],
     label: "w",
     image: "/images/dublin.jpg",
+    images: ["/images/dublin.jpg", "/images/IICAward.jpg", "/images/InternPic.jpg"],
     body: [
       "An MSc in Computer Science at Maynooth University, alongside work as a demonstrator. Sitting with students while they wrestle with the parts of CS that didn't click the first time has sharpened my own fundamentals more than anything else. Teaching forces you to actually know what you claim to know.",
       "At Unum, my Salesforce DevOps internship, I built AI-assisted tooling and CI/CD quality gates that cut roughly 70% of manual effort in plugin development. I also helped build a Microsoft-mentored subtitle translator on Next.js and Azure OpenAI, and a real-time risk monitor for renewable energy grids.",

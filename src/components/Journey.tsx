@@ -34,7 +34,7 @@ export default function Journey() {
   const current = journey[active];
 
   return (
-    <section id="journey" className="mx-auto max-w-6xl px-5 py-20 md:py-28">
+    <section id="journey" className="mx-auto max-w-6xl px-5 pb-8 pt-4 md:pb-12 md:pt-6">
       <div className="flex items-center gap-4">
         <span className="font-mono text-xs uppercase tracking-[0.2em] text-saffron">
           The Journey
